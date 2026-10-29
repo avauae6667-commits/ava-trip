@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0aa5e8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AVA Fleet">
+<title>AVA Fleet — Driver</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--blue:#0aa5e8;--blue2:#0284c7;--ink:#0f172a;--mut:#64748b;--ok:#16a34a;--bad:#dc2626;
+--warn:#b45309;--bg:#f6f8fb;--line:#e2e8f0;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.hidden{display:none!important}
+.topbar{background:linear-gradient(135deg,#0aa5e8,#0277b6);color:#fff;display:flex;align-items:center;
+justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:40}
+.topbar b{font-size:17px;letter-spacing:.3px}
+#syncPill{font-size:11.5px;font-weight:700;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+border-radius:20px;padding:5px 11px;white-space:nowrap}
+#syncPill.ok{background:rgba(22,163,74,.9);border-color:transparent}
+#syncPill.warn{background:rgba(180,83,9,.95);border-color:transparent}
+#syncPill.bad{background:rgba(220,38,38,.95);border-color:transparent}
+.offbar{background:#0f172a;color:#fff;font-size:12.5px;text-align:center;padding:9px 12px;display:none}
+body.offline .offbar{display:block}
+body.offline #syncPill{background:rgba(15,23,42,.85)}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom))}
+.small{font-size:12.5px;color:var(--mut)}
+h1{font-size:24px;letter-spacing:-.4px}
+h2.sec{font-size:15px;text-transform:uppercase;letter-spacing:.9px;color:var(--mut);margin:26px 0 10px}
+.pill{display:inline-flex;align-items:center;gap:7px;background:#fef3c7;color:var(--warn);font-size:12.5px;
+font-weight:700;padding:6px 13px;border-radius:20px;margin-top:9px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0 4px}
+.stat{background:var(--card);border-radius:14px;padding:13px 6px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,.07)}
+.stat b{display:block;font-size:23px;color:var(--blue);line-height:1.15}
+.stat span{font-size:9.5px;color:var(--mut);letter-spacing:.7px;font-weight:700}
+.action{display:flex;align-items:center;gap:14px;width:100%;border:0;border-radius:16px;padding:17px 16px;
+margin:10px 0;color:#fff;text-align:left;cursor:pointer;box-shadow:0 5px 14px rgba(15,23,42,.13);transition:transform .08s}
+.action:active{transform:scale(.985)}
+.action .ic{font-size:26px;flex:none;width:30px;text-align:center}
+.action h3{font-size:16.5px;font-weight:700}
+.action p{font-size:12px;opacity:.9;margin-top:2px}
+.a-blue{background:linear-gradient(135deg,#0aa5e8,#0369a1)}
+.a-orange{background:linear-gradient(135deg,#f59e0b,#c2740a)}
+.a-purple{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+.tabs{display:flex;gap:7px;margin:2px 0 12px;overflow-x:auto;padding-bottom:2px}
+.tabs button{border:1px solid var(--line);background:#fff;color:var(--mut);font-size:12.5px;font-weight:700;
+padding:7px 13px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rec{display:flex;gap:12px;align-items:flex-start;background:var(--card);border-radius:14px;padding:13px;
+margin:8px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);cursor:pointer;border:1px solid transparent}
+.rec:active{border-color:var(--line);background:#fbfdff}
+.rec .thumb{width:46px;height:46px;border-radius:11px;background:#e0f2fe;display:flex;align-items:center;
+justify-content:center;font-size:21px;overflow:hidden;flex:none}
+.rec .thumb img{width:100%;height:100%;object-fit:cover}
+.rec .body{flex:1;min-width:0}
+.rec b{font-size:14.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec small{display:block;color:var(--mut);margin-top:3px;font-size:11.5px}
+.rec .amt{font-weight:800;font-size:14.5px;color:var(--ink);white-space:nowrap}
+.b{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:5px;vertical-align:1px}
+.b-pend{background:#fef3c7;color:var(--warn)}
+.b-ok{background:#dcfce7;color:var(--ok)}
+.b-bad{background:#fee2e2;color:var(--bad)}
+.b-q{background:#e0e7ff;color:#3730a3}
+.b-off{background:#e2e8f0;color:#334155}
+.panel{background:var(--card);border-radius:16px;padding:4px 15px 15px;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.row:last-of-type{border-bottom:0}
+.row span{color:var(--mut)}
+.row b{text-align:right;font-weight:700}
+.sheet{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:flex-end;justify-content:center;z-index:100}
+.sheet.open{display:flex}
+.sheet .inner{background:#fff;width:100%;max-width:560px;max-height:93vh;max-height:93dvh;overflow-y:auto;
+border-radius:22px 22px 0 0;padding:20px 16px calc(26px + env(safe-area-inset-bottom));animation:up .22s ease}
+@keyframes up{from{transform:translateY(50px);opacity:.5}to{transform:none;opacity:1}}
+.sheet h2{font-size:19px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.x{border:1px solid var(--line);background:#fff;border-radius:50%;width:32px;height:32px;font-size:15px;
+cursor:pointer;color:var(--mut);flex:none}
+label{display:block;font-size:11px;font-weight:800;color:var(--mut);letter-spacing:.7px;margin:15px 0 6px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:13px;font-size:16px;
+background:#fff;outline:none;color:var(--ink);font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,165,232,.12)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.types button{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:12px;font-size:14px;
+font-weight:700;cursor:pointer;color:var(--ink)}
+.types button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.photoBox{border:1.5px dashed #cbd5e1;border-radius:14px;padding:20px;text-align:center;cursor:pointer;background:#fbfdff}
+.photoBox img{max-width:100%;border-radius:10px;margin-top:8px;display:block}
+.photoBox .pc{font-size:28px}
+.photoBox b{display:block;font-size:13.5px;margin-top:5px}
+.photoBox .mut{font-size:11.5px;color:var(--mut);text-align:center;margin-top:3px}
+.cta{width:100%;border:0;border-radius:13px;background:linear-gradient(135deg,#0aa5e8,#0284c7);color:#fff;
+font-size:16px;font-weight:800;padding:15px;margin-top:20px;cursor:pointer}
+.cta:disabled{opacity:.55}
+.cta.ghost{background:#f1f5f9;color:var(--ink);margin-top:9px}
+.mut{color:var(--mut);font-size:12.5px}
+.center{text-align:center}
+#loginView{max-width:400px;margin:0 auto;padding:9vh 22px 40px}
+.logo{font-size:30px;font-weight:800;color:var(--blue);letter-spacing:-1px}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);
+background:#0f172a;color:#fff;padding:11px 18px;border-radius:24px;font-size:13.5px;z-index:300;
+display:none;max-width:92vw;text-align:center;line-height:1.35;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.toast.show{display:block;animation:tin .2s ease}
+@keyframes tin{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+.footlinks{display:flex;justify-content:center;gap:18px;margin-top:26px;font-size:12.5px}
+.footlinks a{color:var(--mut);text-decoration:none}
+.footlinks a.danger{color:var(--bad)}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin-top:14px;font-size:13.5px}
+.dl dt{color:var(--mut);font-size:11.5px;font-weight:800;letter-spacing:.5px;padding-top:2px}
+.dl dd{font-weight:600;word-break:break-word}
+.dphoto{width:100%;border-radius:12px;margin-top:14px;border:1px solid var(--line)}
+.qitem{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:11px 13px;margin:8px 0;font-size:12.5px}
+.qitem b{display:block;font-size:13px;color:#9a3412;margin-bottom:3px}
+.qitem .acts{display:flex;gap:8px;margin-top:9px}
+.qitem .acts button{border:0;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:800;cursor:pointer}
+.qitem .acts .r{background:#ffedd5;color:#9a3412}
+.qitem .acts .d{background:#fee2e2;color:var(--bad)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#e0f2fe;color:#075985;
+font-size:13px;font-weight:700;padding:10px 14px}
+.bar button{border:0;border-radius:9px;background:var(--blue2);color:#fff;font-weight:800;font-size:13px;padding:8px 14px;cursor:pointer;flex:none}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="offbar" id="offbar">📴 No internet — your entries are saved on this phone and upload automatically.</div>
+
+<div class="topbar">
+  <b>🚌 AVA Fleet</b>
+  <span id="syncPill">Not signed in</span>
+</div>
+
+<div class="bar hidden" id="updateBar"><span>New version installed</span><button id="updateBtn">Reload</button></div>
+<div class="bar hidden" id="installBar"><span id="installTxt">Install AVA Fleet on this phone</span><button id="installBtn" class="hidden">Install</button></div>
+
+<!-- ===================== LOGIN ===================== -->
+<section id="loginView" class="hidden">
+  <div class="logo">AVA Fleet</div>
+  <p class="small" style="margin:6px 0 22px">Driver sign in</p>
+  <label>PHONE NUMBER</label>
+  <input id="loginPhone" type="tel" inputmode="tel" autocomplete="username" placeholder="0501234567">
+  <label>PIN</label>
+  <input id="loginPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Your 4–6 digit PIN">
+  <button class="cta" id="loginBtn">Sign In</button>
+  <p class="small center" id="loginMsg" role="status" style="margin-top:14px;min-height:18px"></p>
+  <p class="small center" style="margin-top:10px;color:#94a3b8">Forgot your PIN? Ask the office.</p>
+</section>
+
+<!-- ===================== APP ===================== -->
+<main id="appView" class="wrap hidden">
+  <p class="small" style="margin-top:4px">Welcome back,</p>
+  <h1 id="drvName">—</h1>
+  <div><span class="pill">● <span id="cPend">0</span> waiting for the office</span></div>
+
+  <div class="cards">
+    <div class="stat"><b id="cCheck">0</b><span>CHECK-INS</span></div>
+    <div class="stat"><b id="cExp">0</b><span>EXPENSES</span></div>
+    <div class="stat"><b id="cTrip">0</b><span>EXTRA TRIPS</span></div>
+  </div>
+
+  <button class="action a-blue" id="btnCheckin"><span class="ic">📷</span><div><h3>Daily Check-in</h3><p>Bus ODO + stamped photo</p></div></button>
+  <button class="action a-orange" id="btnExpense"><span class="ic">➕</span><div><h3>Report Expense</h3><p>Fuel, maintenance, tyre, receipt</p></div></button>
+  <button class="action a-purple" id="btnTrip"><span class="ic">🗺️</span><div><h3>Extra / Other Trip</h3><p>Any run outside your regular route</p></div></button>
+
+  <h2 class="sec">My activity <span id="activityCount" style="text-transform:none;letter-spacing:0;color:#94a3b8;font-weight:600"></span></h2>
+  <div class="tabs" id="mtabs">
+    <button data-m="cur" class="on">This month</button>
+    <button data-m="prev">Last month</button>
+  </div>
+  <div class="tabs" id="ftabs">
+    <button data-f="all" class="on">All</button>
+    <button data-f="checkin">Check-ins</button>
+    <button data-f="expense">Expenses</button>
+    <button data-f="trip">Trips</button>
+    <button data-f="unsent">Not sent</button>
+  </div>
+  <div id="activity"></div>
+
+  <button class="cta ghost" id="btnLogout" style="margin-top:26px;background:#fee2e2;color:#b91c1c;font-weight:800">Sign out</button>
+</main>
+
+<!-- ===================== CHECK-IN ===================== -->
+<div class="sheet" id="sheet-checkin"><div class="inner">
+  <h2>📷 Daily Check-in <button class="x" data-close>✕</button></h2>
+  <p class="small">Once a day, before you start. The photo is stamped with the real time and GPS.</p>
+  <label>BUS NUMBER</label>
+  <input id="ciBus" autocomplete="off" placeholder="e.g. 1245">
+  <label>ODO METER READING (KM)</label>
+  <input id="ciOdo" inputmode="numeric" placeholder="e.g. 45231">
+  <label>ODO PHOTO <span style="font-weight:600;color:#94a3b8">— required</span></label>
+  <div class="photoBox" id="ciPhotoBtn">
+    <div id="ciPreview"><div class="pc">📷</div><b>Take the ODO photo</b><div class="mut">Time &amp; location are printed on it</div></div>
+  </div>
+  <button class="cta" id="ciSubmit">Save check-in</button>
+</div></div>
+
+<!-- ===================== EXPENSE ===================== -->
+<div class="sheet" id="sheet-expense"><div class="inner">
+  <h2>➕ Report Expense <button class="x" data-close>✕</button></h2>
+  <label>BUS NUMBER</label>
+  <input id="exBus" autocomplete="off" placeholder="e.g. 1245">
+  <label>EXPENSE TYPE</label>
+  <div class="types" id="exTypes">
+    <button class="on" data-v="Fuel">⛽ Fuel</button>
+    <button data-v="Maintenance">🔧 Maintenance</button>
+    <button data-v="Tyre">🛞 Tyre</button>
+    <button data-v="Other">📦 Other</button>
+  </div>
+  <label>ODO (KM) <span style="font-weight:600;color:#94a3b8">— optional</span></label>
+  <input id="exOdo" inputmode="numeric" placeholder="e.g. 45320">
+  <div class="grid2">
+    <div><label>LITRES</label><input id="exVol" inputmode="decimal" placeholder="e.g. 80"></div>
+    <div><label>UNIT PRICE (AED)</label><input id="exPrice" inputmode="decimal" placeholder="e.g. 2.85"></div>
+  </div>
+  <label>TOTAL AMOUNT (AED)</label>
+  <input id="exAmt" inputmode="decimal" placeholder="0.00">
+  <label>DETAILS</label>
+  <input id="exDet" placeholder="e.g. ADNOC — Dubai to Sharjah">
+  <label>RECEIPT PHOTO <span style="font-weight:600;color:#94a3b8">— optional</span></label>
+  <div class="photoBox" id="exPhotoBtn">
+    <div id="exPreview"><div class="pc">🧾</div><b>Add the receipt</b><div class="mut">Time &amp; location are printed on it</div></div>
+  </div>
+  <button class="cta" id="exSubmit">Save expense</button>
+</div></div>
+
+<!-- ===================== TRIP ===================== -->
+<div class="sheet" id="sheet-trip"><div class="inner">
+  <h2>🗺️ Extra / Other Trip <button class="x" data-close>✕</button></h2>
+  <p class="small">Use this for any run outside your regular schedule — special run, one-off pickup, diversion.</p>
+  <label>DATE</label><input id="trDate" type="date">
+  <label>ROUTE (FROM → TO)</label><input id="trRoute" placeholder="e.g. Sharjah Industrial → Jebel Ali">
+  <div class="grid2">
+    <div><label>TIME</label><input id="trTime" type="time"></div>
+    <div><label>PASSENGERS / TRIPS</label><input id="trCount" inputmode="numeric" placeholder="optional"></div>
+  </div>
+  <label>DETAILS</label><textarea id="trDet" rows="3" placeholder="Anything the office should know"></textarea>
+  <button class="cta" id="trSubmit">Save trip</button>
+</div></div>
+
+<!-- ===================== DETAIL ===================== -->
+<div class="sheet" id="sheet-detail"><div class="inner">
+  <h2><span id="dTitle">Record</span> <button class="x" data-close>✕</button></h2>
+  <div id="dStatus" style="margin-top:8px"></div>
+  <dl class="dl" id="dBody"></dl>
+  <div id="dPhotoWrap"></div>
+</div></div>
+
+<input type="file" id="camInput" accept="image/jpeg,image/png,image/*" capture="environment" class="hidden">
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script src="sync.js"></script>
+<script src="driver-app.js"></script>
+</body>
+</html>

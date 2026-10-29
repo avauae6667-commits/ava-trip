@@ -1,0 +1,18 @@
+{
+  "id": "./driver.html",
+  "name": "AVA Fleet — Driver",
+  "short_name": "AVA Fleet",
+  "description": "Daily check-ins, expenses and extra trips for AVA Fleet drivers",
+  "start_url": "./driver.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#f6f8fb",
+  "theme_color": "#0aa5e8",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

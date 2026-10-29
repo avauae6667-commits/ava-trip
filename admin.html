@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AVA Admin">
+<link rel="manifest" href="admin-manifest.json">
+<link rel="apple-touch-icon" href="admin-icon-192.png">
+<title>AVA Fleet — Office</title>
+<style>
+:root{--blue:#0aa5e8;--ink:#0f172a;--mut:#64748b;--ok:#16a34a;--bad:#dc2626;--warn:#b45309;--bg:#f4f7fb;--line:#e2e8f0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif}
+body{background:var(--bg);color:var(--ink)}
+.hidden{display:none!important}
+header{background:#0f172a;color:#fff;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;position:sticky;top:0;z-index:50}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;max-width:1180px;margin:0 auto}
+header h1{font-size:17px;letter-spacing:-.2px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:#1e293b;color:#cbd5e1;border:0;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
+nav button.on{background:var(--blue);color:#fff}
+main{max-width:1180px;margin:20px auto;padding:0 16px 80px}
+h2{font-size:16px;margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+h2 .cnt{background:#e0f2fe;color:#0369a1;font-size:11.5px;padding:2px 9px;border-radius:20px;font-weight:800}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px;margin:14px 0}
+.kpi{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(15,23,42,.07)}
+.kpi span{font-size:10.5px;letter-spacing:.6px;color:var(--mut);font-weight:800;text-transform:uppercase}
+.kpi b{display:block;font-size:24px;margin-top:3px}
+.tw{overflow-x:auto;background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(15,23,42,.07)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:#f8fafc;text-align:left;padding:11px 12px;font-size:10.5px;letter-spacing:.6px;color:var(--mut);text-transform:uppercase;white-space:nowrap}
+td{padding:11px 12px;border-top:1px solid #f1f5f9;vertical-align:middle}
+tr:hover td{background:#fbfdff}
+.b{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px}
+.b-pend{background:#fef3c7;color:var(--warn)}
+.b-ok{background:#dcfce7;color:var(--ok)}
+.b-bad{background:#fee2e2;color:var(--bad)}
+.btn{border:0;border-radius:8px;padding:7px 11px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap}
+.btn.ok{background:#dcfce7;color:#15803d}
+.btn.no{background:#fee2e2;color:#b91c1c}
+.btn.blue{background:#e0f2fe;color:#0369a1}
+.btn.grey{background:#f1f5f9;color:#475569}
+.btn:disabled{opacity:.5}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:11px;font-size:15px;width:100%;font-family:inherit;background:#fff}
+label{display:block;font-size:10.5px;font-weight:800;color:var(--mut);letter-spacing:.6px;margin:14px 0 5px}
+.panel{background:#fff;border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(15,23,42,.07);max-width:460px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.tools input,.tools select{width:auto;flex:1;min-width:130px;padding:9px 11px;font-size:13.5px}
+.login{max-width:380px;margin:10vh auto;background:#fff;border-radius:18px;padding:26px;box-shadow:0 8px 30px rgba(15,23,42,.1)}
+.cta{width:100%;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:15.5px;font-weight:800;padding:14px;margin-top:18px;cursor:pointer}
+.mut{color:var(--mut);font-size:12.5px}
+img.thumb{width:46px;height:46px;object-fit:cover;border-radius:9px;cursor:pointer;background:#e0f2fe}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:10px;padding:14px}
+#lightbox img{max-width:96vw;max-height:86vh;border-radius:8px}
+#lightbox a{color:#7dd3fc;font-size:13px;font-weight:700}
+a{color:#0369a1}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 18px;border-radius:22px;font-size:13.5px;z-index:300;display:none;max-width:92vw;text-align:center}
+.det{font-size:12px;color:var(--mut);max-width:260px}
+.fl{color:#b91c1c;font-size:11px;font-weight:700}
+@media(max-width:760px){
+ header{padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
+ main{padding:0 10px 70px;margin:12px auto}
+ nav{position:fixed;left:0;right:0;bottom:0;background:#0f172a;padding:7px 7px calc(7px + env(safe-area-inset-bottom));z-index:60;justify-content:space-between}
+ nav button{flex:1;padding:11px 2px;font-size:11px;border-radius:8px}
+ .tw{border-radius:12px}.tw table{min-width:640px}
+ h2{font-size:15px}
+ input,select{font-size:16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <h1>🚌 AVA Fleet — Office</h1>
+    <nav id="nav" class="hidden">
+      <button data-tab="dash" class="on">Approvals</button>
+      <button data-tab="all">All records</button>
+      <button data-tab="drivers">Drivers</button>
+      <button data-tab="add">+ Driver</button>
+      <button id="btnOut">Sign out</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="loginView" class="login">
+    <h2>Office sign in</h2>
+    <label>PASSWORD</label>
+    <input id="pass" type="password" autocomplete="current-password" placeholder="Admin password">
+    <button class="cta" id="btnLogin">Sign in</button>
+    <p class="mut" id="loginMsg" style="margin-top:12px;min-height:16px"></p>
+    <button class="btn grey" id="btnChange" style="width:100%;margin-top:10px;padding:11px">Change server</button>
+    <p class="mut" style="margin-top:14px">iPhone: Share → Add to Home Screen. Android: Chrome ⋮ → Install app.</p>
+  </section>
+
+  <div id="appView" class="hidden">
+    <div class="tools">
+      <button class="btn blue" id="btnRefresh">↻ Refresh</button>
+      <button class="btn blue" id="btnCsv">⬇ Export CSV</button>
+      <a class="btn blue" id="lnkMaster" target="_blank" rel="noopener" style="text-decoration:none;display:none">Master sheet ↗</a>
+      <a class="btn blue" id="lnkFolder" target="_blank" rel="noopener" style="text-decoration:none;display:none">Photos folder ↗</a>
+      <span class="mut" id="lastLoad"></span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section id="tab-dash">
+      <div class="cards" id="kpi"></div>
+      <h2>Waiting for approval <span class="cnt" id="cntPend">0</span></h2>
+      <div class="tw"><table><thead><tr>
+        <th>Type</th><th>Driver</th><th>Details</th><th>Photo</th><th>When</th><th>Decision</th>
+      </tr></thead><tbody id="tbPend"></tbody></table></div>
+      <h2>Recently decided <span class="cnt" id="cntHist">0</span></h2>
+      <div class="tw"><table><thead><tr>
+        <th>Type</th><th>Driver</th><th>Details</th><th>Photo</th><th>Status</th><th>When</th>
+      </tr></thead><tbody id="tbHist"></tbody></table></div>
+    </section>
+
+    <!-- ALL -->
+    <section id="tab-all" class="hidden">
+      <div class="tools">
+        <input id="fSearch" placeholder="Search driver, bus, route, amount…">
+        <select id="fKind">
+          <option value="">All types</option>
+          <option value="checkin">Check-ins</option>
+          <option value="expense">Expenses</option>
+          <option value="trip">Extra trips</option>
+        </select>
+        <select id="fStatus">
+          <option value="">All statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+      <h2>All records <span class="cnt" id="cntAll">0</span></h2>
+      <div class="tw"><table><thead><tr>
+        <th>Type</th><th>Driver</th><th>Bus</th><th>Details</th><th>Photo</th><th>Status</th><th>When</th><th></th>
+      </tr></thead><tbody id="tbAll"></tbody></table></div>
+    </section>
+
+    <!-- DRIVERS -->
+    <section id="tab-drivers" class="hidden">
+      <h2>Drivers <span class="cnt" id="cntDrv">0</span></h2>
+      <div class="tw"><table><thead><tr>
+        <th>Name</th><th>Phone</th><th>Bus</th><th>Status</th><th>Photo folder</th><th>Actions</th>
+      </tr></thead><tbody id="tbDrv"></tbody></table></div>
+    </section>
+
+    <!-- ADD -->
+    <section id="tab-add" class="hidden">
+      <div class="panel">
+        <h2>Add a driver</h2>
+        <p class="mut">The driver signs in with this phone number and PIN. They see only their own records.</p>
+        <label>FULL NAME</label><input id="dName" placeholder="e.g. Abdul Gafoor" autocomplete="off">
+        <label>PHONE NUMBER</label><input id="dPhone" type="tel" inputmode="tel" placeholder="e.g. 0501234567" autocomplete="off">
+        <label>BUS NUMBER</label><input id="dBus" placeholder="e.g. 1245" autocomplete="off">
+        <label>PIN (4–6 DIGITS)</label><input id="dPin" inputmode="numeric" maxlength="6" placeholder="e.g. 4821" autocomplete="off">
+        <button class="cta" id="btnAdd">Create driver</button>
+        <p class="mut" id="addMsg" style="margin-top:12px;min-height:16px"></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="lightbox"><img id="lbImg" alt=""><a id="lbLink" target="_blank" rel="noopener">Open in Google Drive ↗</a></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+/* ============================================================
+   AVA Fleet — office console
+   Talks to the same Apps Script API as the driver app.
+   The driver app never sees these actions without the admin token.
+   ============================================================ */
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var CFG=(window.AVA_CONFIG||{});
+var S={api:"",token:"",data:null,tab:"dash",q:""};
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+var toastT=null;
+function toast(m,ms){var t=$("toast");t.textContent=m;t.style.display="block";
+  clearTimeout(toastT);toastT=setTimeout(function(){t.style.display="none";},ms||2800);}
+
+function apiUrl(){
+  var u=localStorage.getItem("ava_api")||CFG.API_URL||"";
+  if(u==="PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE")u="";
+  return u;
+}
+function post(body,timeout){
+  return new Promise(function(res,rej){
+    var ctl=null,done=false;
+    try{if(window.AbortController)ctl=new AbortController();}catch(e){}
+    var t=setTimeout(function(){if(done)return;done=true;try{if(ctl)ctl.abort();}catch(e){}rej(new Error("timeout"));},timeout||60000);
+    var o={method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)};
+    if(ctl)o.signal=ctl.signal;
+    fetch(S.api,o).then(function(r){return r.text();}).then(function(txt){
+      if(done)return;done=true;clearTimeout(t);
+      var j;try{j=JSON.parse(txt);}catch(e){return rej(new Error("bad-json"));}
+      res(j);
+    }).catch(function(e){if(done)return;done=true;clearTimeout(t);rej(e);});
+  });
+}
+function fmt(iso){var d=new Date(iso);if(isNaN(d))return "";
+  return d.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+
+/* -------- boot -------- */
+S.api=apiUrl();
+S.token=localStorage.getItem("ava_admin_token")||"";
+if(S.token){showApp();load();}else{$("loginView").classList.remove("hidden");}
+
+$("btnLogin").onclick=function(){
+  var p=$("pass").value;
+  if(!p)return ($("loginMsg").textContent="Enter the password.");
+  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(S.api))
+    return ($("loginMsg").textContent="Set the API URL in config.js first (the line that ends with /exec).");
+  $("btnLogin").disabled=true;$("loginMsg").textContent="Signing in…";
+  post({action:"adminLogin",password:p},45000).then(function(r){
+    if(!r.ok)throw new Error(r.error||"Sign in failed");
+    S.token=r.token;
+    localStorage.setItem("ava_admin_token",r.token);
+    $("loginMsg").textContent="";$("pass").value="";
+    showApp();load();
+  }).catch(function(e){
+    $("loginMsg").textContent=e.message==="timeout"?"Server did not answer — try again":
+      e.message==="bad-json"?"Wrong URL — it must be the /exec URL":(e.message||"Sign in failed");
+  }).then(function(){$("btnLogin").disabled=false;});
+};
+$("pass").addEventListener("keydown",function(e){if(e.key==="Enter")$("btnLogin").click();});
+$("btnChange").onclick=function(){
+  var u=prompt("Paste the Apps Script Web App URL (ends with /exec):",S.api||"");
+  if(!u)return;
+  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u.trim()))return alert("That is not a valid /exec URL.");
+  localStorage.setItem("ava_api",u.trim());location.reload();
+};
+$("btnOut").onclick=function(){
+  localStorage.removeItem("ava_admin_token");S.token="";location.reload();
+};
+function showApp(){
+  $("loginView").classList.add("hidden");
+  $("appView").classList.remove("hidden");
+  $("nav").classList.remove("hidden");
+}
+
+/* -------- load -------- */
+function load(){
+  if(!S.token)return;
+  $("btnRefresh").disabled=true;
+  post({action:"adminData",token:S.token},90000).then(function(r){
+    if(r.code==="AUTH"||(!r.ok&&/sign in again/i.test(r.error||""))){
+      localStorage.removeItem("ava_admin_token");toast("Session expired — sign in again");
+      setTimeout(function(){location.reload();},1200);return;
+    }
+    if(!r.ok)throw new Error(r.error||"Could not load");
+    S.data=r;
+    $("lastLoad").textContent="Updated "+fmt(r.serverTime);
+    if(r.masterUrl){$("lnkMaster").href=r.masterUrl;$("lnkMaster").style.display="inline-block";}
+    if(r.folderUrl){$("lnkFolder").href=r.folderUrl;$("lnkFolder").style.display="inline-block";}
+    render();
+  }).catch(function(e){
+    toast(e.message==="timeout"?"Server is slow — try Refresh":"Could not load: "+(e.message||"network"));
+  }).then(function(){$("btnRefresh").disabled=false;});
+}
+$("btnRefresh").onclick=function(){load();};
+
+/* -------- render -------- */
+function recs(){return (S.data&&S.data.records)||[];}
+function typeLabel(r){return r.kind==="checkin"?"📷 Check-in":r.kind==="expense"?"🧾 "+esc(r.expType||"Expense"):"🗺️ Trip";}
+function detailText(r){
+  if(r.kind==="checkin")return "Bus "+esc(r.bus)+" · ODO <b>"+esc(r.odo)+"</b> km";
+  if(r.kind==="expense")return "AED <b>"+esc(r.amount)+"</b>"+(r.volume?" · "+esc(r.volume)+" L":"")+
+    (r.odo?" · ODO "+esc(r.odo):"")+(r.details?'<div class="det">'+esc(r.details)+'</div>':"");
+  return esc(r.route)+(r.time?" · "+esc(r.time):"")+(r.details?'<div class="det">'+esc(r.details)+'</div>':"");
+}
+function photoCell(r){
+  if(!r.photoView)return '<span class="mut">—</span>';
+  return '<img class="thumb" src="'+esc(r.photoThumb||r.photoUrl)+'" data-full="'+esc(r.photoUrl)+'" data-link="'+esc(r.photoView)+'" alt="" loading="lazy">';
+}
+function bad(r){
+  if(r.status==="Approved")return '<span class="b b-ok">Approved</span>';
+  if(r.status==="Rejected")return '<span class="b b-bad">Rejected</span>';
+  return '<span class="b b-pend">Pending</span>';
+}
+function flags(r){return r.flags?'<div class="fl">'+esc(String(r.flags).replace(/,/g," · "))+'</div>':"";}
+
+function render(){
+  var all=recs();
+  var c=(S.data&&S.data.counts)||{};
+  $("kpi").innerHTML=[
+    ["PENDING",c.pending||0],["CHECK-INS",c.checkin||0],["EXPENSES",c.expense||0],
+    ["EXTRA TRIPS",c.trip||0],["EXPENSE TOTAL","AED "+Number(c.expenseTotal||0).toFixed(2)],
+    ["DRIVERS",((S.data&&S.data.drivers)||[]).filter(function(d){return d.active;}).length]
+  ].map(function(k){return '<div class="kpi"><span>'+k[0]+'</span><b>'+k[1]+'</b></div>';}).join("");
+
+  var pend=all.filter(function(r){return r.status==="Pending";});
+  var hist=all.filter(function(r){return r.status!=="Pending";}).slice(0,120);
+  $("cntPend").textContent=pend.length;
+  $("cntHist").textContent=hist.length;
+  $("cntAll").textContent=all.length;
+  $("tbPend").innerHTML=pend.length?pend.map(function(r){
+    return '<tr><td>'+typeLabel(r)+'</td><td><b>'+esc(r.driverName)+'</b><div class="mut">'+esc(r.device||"")+'</div></td>'+
+      '<td>'+detailText(r)+flags(r)+'</td><td>'+photoCell(r)+'</td><td>'+fmt(r.createdAt)+'</td>'+
+      '<td><button class="btn ok" data-ok="'+esc(r.id)+'">✓ Approve</button> '+
+      '<button class="btn no" data-no="'+esc(r.id)+'">✕ Reject</button></td></tr>';
+  }).join(""):'<tr><td colspan="6" class="mut" style="padding:22px;text-align:center">Nothing waiting. 🎉</td></tr>';
+
+  $("tbHist").innerHTML=hist.map(function(r){
+    return '<tr><td>'+typeLabel(r)+'</td><td>'+esc(r.driverName)+'</td><td>'+detailText(r)+flags(r)+'</td>'+
+      '<td>'+photoCell(r)+'</td><td>'+bad(r)+'</td><td>'+fmt(r.createdAt)+'</td></tr>';
+  }).join("")||'<tr><td colspan="6" class="mut" style="padding:18px;text-align:center">No decisions yet.</td></tr>';
+
+  var fq=S.q.toLowerCase(),fk=$("fKind").value,fs=$("fStatus").value;
+  var filtered=all.filter(function(r){
+    if(fk&&r.kind!==fk)return false;
+    if(fs&&r.status!==fs)return false;
+    if(fq){
+      var hay=[r.driverName,r.bus,r.route,r.details,r.expType,r.amount,r.odo].join(" ").toLowerCase();
+      if(hay.indexOf(fq)<0)return false;
+    }
+    return true;
+  });
+  $("tbAll").innerHTML=filtered.slice(0,400).map(function(r){
+    return '<tr><td>'+typeLabel(r)+'</td><td>'+esc(r.driverName)+'</td><td>'+esc(r.bus)+'</td>'+
+      '<td>'+detailText(r)+flags(r)+'</td><td>'+photoCell(r)+'</td><td>'+bad(r)+'</td>'+
+      '<td>'+fmt(r.createdAt)+'</td><td>'+(r.status==="Pending"
+        ?'<button class="btn ok" data-ok="'+esc(r.id)+'">✓</button> <button class="btn no" data-no="'+esc(r.id)+'">✕</button>'
+        :'<button class="btn grey" data-undo="'+esc(r.id)+'">Undo</button>')+'</td></tr>';
+  }).join("")||'<tr><td colspan="8" class="mut" style="padding:18px;text-align:center">No records match.</td></tr>';
+
+  var drv=(S.data&&S.data.drivers)||[];
+  $("cntDrv").textContent=drv.length;
+  $("tbDrv").innerHTML=drv.map(function(d){
+    return '<tr><td><b>'+esc(d.name)+'</b></td><td>'+esc(d.phone)+'</td><td>'+esc(d.bus||"—")+'</td>'+
+      '<td>'+(d.active?'<span class="b b-ok">Active</span>':'<span class="b b-bad">Disabled</span>')+'</td>'+
+      '<td>'+(d.folderUrl?'<a href="'+esc(d.folderUrl)+'" target="_blank" rel="noopener">Open ↗</a>':'<span class="mut">—</span>')+'</td>'+
+      '<td><button class="btn blue" data-pin="'+esc(d.id)+'" data-name="'+esc(d.name)+'">Reset PIN</button> '+
+      '<button class="btn grey" data-act="'+esc(d.id)+'" data-on="'+(d.active?"0":"1")+'">'+(d.active?"Disable":"Enable")+'</button></td></tr>';
+  }).join("")||'<tr><td colspan="6" class="mut" style="padding:18px;text-align:center">No drivers yet — add the first one.</td></tr>';
+}
+
+function decide(id,status){
+  var note="";
+  if(status==="Rejected"){
+    note=prompt("Reason for rejecting (the driver will see it):","")||"";
+  }
+  post({action:"decide",token:S.token,recordId:id,status:status,note:note},45000).then(function(r){
+    if(!r.ok)throw new Error(r.error||"Failed");
+    var rec=recs().filter(function(x){return x.id===id;})[0];
+    if(rec){rec.status=status;rec.decidedAt=new Date().toISOString();rec.adminNote=note;}
+    if(S.data&&S.data.counts){recalc();}
+    render();toast(status==="Pending"?"Moved back to pending":"Saved ✓");
+  }).catch(function(e){toast("Could not save: "+(e.message||"network"));});
+}
+function recalc(){
+  var all=recs(),c={checkin:0,expense:0,trip:0,pending:0,expenseTotal:0};
+  all.forEach(function(r){
+    if(c[r.kind]!==undefined)c[r.kind]++;
+    if(r.status==="Pending")c.pending++;
+    if(r.kind==="expense"&&r.status!=="Rejected")c.expenseTotal+=Number(r.amount)||0;
+  });
+  c.expenseTotal=Math.round(c.expenseTotal*100)/100;
+  S.data.counts=c;
+}
+
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-ok],[data-no],[data-undo],[data-pin],[data-act],[data-full]");
+  if(!t)return;
+  if(t.hasAttribute("data-ok"))return decide(t.getAttribute("data-ok"),"Approved");
+  if(t.hasAttribute("data-no"))return decide(t.getAttribute("data-no"),"Rejected");
+  if(t.hasAttribute("data-undo"))return decide(t.getAttribute("data-undo"),"Pending");
+  if(t.hasAttribute("data-pin")){
+    var id=t.getAttribute("data-pin"),name=t.getAttribute("data-name");
+    var pin=prompt("New 4–6 digit PIN for "+name+":","");
+    if(!pin)return;
+    if(!/^\d{4,6}$/.test(pin))return alert("The PIN must be 4–6 digits.");
+    post({action:"resetPin",token:S.token,driverId:id,pin:pin},45000).then(function(r){
+      if(!r.ok)throw new Error(r.error||"Failed");
+      alert("PIN changed. The driver must sign in again on their phone.");
+    }).catch(function(e){alert("Could not change the PIN: "+(e.message||"network"));});
+    return;
+  }
+  if(t.hasAttribute("data-act")){
+    var did=t.getAttribute("data-act"),on=t.getAttribute("data-on")==="1";
+    if(!confirm((on?"Enable":"Disable")+" this driver?"))return;
+    post({action:"setActive",token:S.token,driverId:did,active:on},45000).then(function(r){
+      if(!r.ok)throw new Error(r.error||"Failed");
+      load();
+    }).catch(function(e){toast("Could not update: "+(e.message||"network"));});
+    return;
+  }
+  if(t.hasAttribute("data-full")){
+    $("lbImg").src=t.getAttribute("data-full");
+    $("lbLink").href=t.getAttribute("data-link");
+    $("lightbox").style.display="flex";
+  }
+});
+$("lightbox").onclick=function(e){if(e.target.id!=="lbImg")$("lightbox").style.display="none";};
+
+$("fSearch").addEventListener("input",function(){S.q=this.value;render();});
+$("fKind").addEventListener("change",render);
+$("fStatus").addEventListener("change",render);
+
+$("nav").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-tab]");if(!b)return;
+  var t=b.getAttribute("data-tab");
+  ["dash","all","drivers","add"].forEach(function(k){
+    $("tab-"+k).classList.toggle("hidden",k!==t);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("nav button[data-tab]"),function(x){x.classList.remove("on");});
+  b.classList.add("on");
+});
+
+$("btnAdd").onclick=function(){
+  var d={name:$("dName").value.trim(),phone:$("dPhone").value.trim(),bus:$("dBus").value.trim(),pin:$("dPin").value.trim()};
+  var m=$("addMsg");
+  if(!d.name||!d.phone||!d.pin)return (m.style.color="#dc2626",m.textContent="Name, phone and PIN are required.");
+  $("btnAdd").disabled=true;m.style.color="#64748b";m.textContent="Creating…";
+  post({action:"addDriver",token:S.token,driver:d},60000).then(function(r){
+    if(!r.ok)throw new Error(r.error||"Failed");
+    m.style.color="#16a34a";
+    m.textContent="✓ "+d.name+" created. Phone "+d.phone+", PIN "+d.pin+" — give these to the driver.";
+    $("dName").value=$("dPhone").value=$("dBus").value=$("dPin").value="";
+    load();
+  }).catch(function(e){
+    m.style.color="#dc2626";m.textContent=e.message||"Could not create the driver";
+  }).then(function(){$("btnAdd").disabled=false;});
+};
+
+$("btnCsv").onclick=function(){
+  var all=recs();
+  if(!all.length)return toast("Nothing to export yet");
+  var head=["ReceivedAt","ClientTime","Driver","Bus","Kind","Status","ExpType","Odo","Volume","UnitPrice","Amount","Details","TripDate","Route","TripTime","Lat","Lng","Flags","Photo","Device"];
+  var rows=all.map(function(r){
+    return [r.receivedAt,r.createdAt,r.driverName,r.bus,r.kind,r.status,r.expType,r.odo,r.volume,r.unitPrice,
+      r.amount,r.details,r.date,r.route,r.time,r.lat,r.lng,r.flags,r.photoView,r.device]
+      .map(function(v){v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(",");
+  });
+  var csv=head.join(",")+"\n"+rows.join("\n");
+  var blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="ava-fleet-records-"+new Date().toISOString().slice(0,10)+".csv";
+  a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+};
+
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
+})();
+</script>
+</body>
+</html>
